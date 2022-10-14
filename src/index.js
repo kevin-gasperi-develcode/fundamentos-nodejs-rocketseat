@@ -9,6 +9,8 @@ app.use(express.json());
 
 const customers = [];
 
+// >>>>>>>>>>>>>>>>>>>>>>>> CONTINUAR DO CAPÍTULO 2
+
 // Podemos passar query params para verificação de itens ou enviá-los via headers
 
 // todo midware deve receber 3 parâmetros. ele ocorre antes da função em si, e o next passa para a próxima função
@@ -108,37 +110,47 @@ app.get("/statement/date", verifyIfExistsAcountCPF, (request, response) => {
 
   const { date } = request.query;
 
-  const  dateFormat = new Date(date = "00:00")
+  const dateFormat = new Date(date + " 00:00");
 
   const statement = customer.statement.filter(
     (statement) =>
-    statement.created_at.toDateString() ===
-    new Date(dateFormat).toDateString()
+      statement.created_at.toDateString() ===
+      new Date(dateFormat).toDateString()
   );
 
-  return response.json(customer.statement);
+  return response.json(statement);
+});
+
+app.put("/account", verifyIfExistsAcountCPF, (request, response) => {
+  const { name } = request.body;
+
+  const { customer } = request;
+
+  customer.name = name;
+
+  return response.status(201).send();
+});
+
+app.get("/account", verifyIfExistsAcountCPF, (request, response) => {
+  const { customer } = request;
+
+  return response.json(customer);
+});
+
+app.delete("/account", verifyIfExistsAcountCPF, (request, response) => {
+  customers.splice(customers, 1);
+
+  return response.status(200).json(customers);
+});
+
+app.get("/balance", verifyIfExistsAcountCPF, (request, response) => {
+  const { customer } = request;
+
+  const balance = getBalance(customer.statement);
+
+  return response.json(balance);
 });
 
 app.listen(3334);
 
 app.use(express.json());
-
-// app.get("/courses", (request, response) => {
-//   const query = request.query;
-//   console.log(query);
-//   return response.json(["curso1", "curso2", "curso3"]);
-// });
-// app.post("/courses", (request, response) => {
-//   const body = request.body;
-//   console.log(body);
-//   return response.json(["curso1", "curso2", "curso3"]);
-// });
-// app.put("/courses/:id", (request, response) => {
-//   return response.json(["curso1", "curso2", "curso3"]);
-// });
-// app.patch("/courses/:id", (request, response) => {
-//   return response.json(["curso1", "curso2", "curso3"]);
-// });
-// app.delete("/courses/:id", (request, response) => {
-//   return response.json(["curso1", "curso2", "curso3"]);
-// });
